@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "spiderbot"
+version = "0.1.0"
+description = ""
+authors = ["Viraj Shah <viraj.v.shah03@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+imageai = {git = "https://github.com/viraj-s15/ImageAI.git", rev = "master"}
+opencv-python = "^4.9.0.80"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
