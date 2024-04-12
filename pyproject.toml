@@ -11,6 +11,7 @@ python = ">=3.10,<3.11"
 imageai = {git = "https://github.com/viraj-s15/ImageAI.git", rev = "master"}
 opencv-python = "^4.9.0.80"
 tk = "^0.1.0"
+customtkinter = "^5.2.2"
 
 
 [build-system]
