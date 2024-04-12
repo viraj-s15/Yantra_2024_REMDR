@@ -97,13 +97,14 @@ def detect_objects(detector, camera, run_time):
     cv2.destroyAllWindows()
 
 
-def run_detect_objects(run_time):
+def run_detect_objects(run_time, app):
     set_environment()
     execution_path = os.getcwd()
     camera = cv2.VideoCapture(0)
     detector = get_detector(execution_path)
-    detect_objects(detector, camera, run_time)
-
+    while app.is_running:
+        detect_objects(detector, camera, run_time)
+    camera.release()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Specify the runtime of the script.")
@@ -116,5 +117,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     run_detect_objects(args.run_time)
 # Release resources
-cv2.release()
-cv2.destroyAllWindows()
+    cv2.destroyAllWindows()
+    
