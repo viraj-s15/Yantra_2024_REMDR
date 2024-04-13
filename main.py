@@ -1,4 +1,3 @@
-# YOLOv3 🚀 by Ultralytics, AGPL-3.0 license
 """
 Run YOLOv3 detection inference on images, videos, directories, globs, YouTube, webcam, streams, etc.
 
@@ -36,10 +35,13 @@ import sys
 from pathlib import Path
 import threading
 import torch
-
+import requests
+import json
+import dotenv
 
 os.environ["HSA_OVERRIDE_GFX_VERSION"] = "10.3.0"
 os.environ["MIOPEN_USER_DB_PATH"] = "/tmp"
+dotenv.load_dotenv()
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv3 root directory
@@ -182,7 +184,7 @@ def run(
                 p, im0, frame = path[i], im0s[i].copy(), dataset.count
                 s += f"{i}: "
                 im1 = im0.copy()
-                cv2.imshow(str(p),im0)
+                cv2.imshow(str(p), im0)
             else:
                 p, im0, frame = path, im0s.copy(), getattr(dataset, "frame", 0)
 
@@ -238,13 +240,13 @@ def run(
             im0 = annotator.result()
             if view_img:
                 # if platform.system() == "Linux" and p not in windows:
-                    # windows.append(p)
-                    # cv2.namedWindow(
-                    #     str(p), cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO
-                    # )  # allow window resize (Linux)
-                    # cv2.resizeWindow(str(p), im0.shape[1], im0.shape[0])
-                yield (cv2, str(p),im0,im1)
-                
+                # windows.append(p)
+                # cv2.namedWindow(
+                #     str(p), cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO
+                # )  # allow window resize (Linux)
+                # cv2.resizeWindow(str(p), im0.shape[1], im0.shape[0])
+                yield (cv2, str(p), im0, im1)
+
                 # cv2.imshow(str(p), im0)
                 cv2.waitKey(1)  # 1 millisecond
 
@@ -395,6 +397,7 @@ def main(opt):
     check_requirements(ROOT / "requirements.txt", exclude=("tensorboard", "thop"))
     run(**vars(opt))
 
+
 @smart_inference_mode()
 def run_detection_in_app(
     weights="weights/yolov5s.pt",  # model path or triton URL
@@ -425,7 +428,8 @@ def run_detection_in_app(
     dnn=False,  # use OpenCV DNN for ONNX inference
     vid_stride=1,  # video frame-rate stride):
 ):
-    run(weights="yolov5s.pt",  # model path or triton URL
+    run(
+        weights="yolov5s.pt",  # model path or triton URL
         source=0,  # file/dir/URL/glob/screen/0(webcam)
         data=data,  # dataset.yaml path
         imgsz=imgsz,  # inference size (height, width)
@@ -453,7 +457,14 @@ def run_detection_in_app(
         dnn=dnn,  # use OpenCV DNN for ONNX inference
         vid_stride=vid_stride,  # video frame-rate stride):
     )
-    
+
+
+# async def get_gas_sensor_data():
+#     # https://api.thingspeak.com/channels/2506793/feeds.json?api_key=S65GKW3ONDR8UIBJ&results=2
+#     res = requests.get(f"https://api.thingspeak.com/channels/2506793/feeds.json?api_key={os.getenv("THINKSPEAK_API_KEY")}&results=2")
+
+#     data_json = json.loads(res)
+#     print(data_json)
 
 if __name__ == "__main__":
     opt = parse_opt()

@@ -6,3 +6,5 @@ __pycache__
 weights/yolov3.pt
 .vscode/settings.json
 .metals
+.env
+test.py
