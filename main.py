@@ -34,7 +34,7 @@ import os
 import platform
 import sys
 from pathlib import Path
-
+import threading
 import torch
 
 
@@ -78,8 +78,8 @@ from utils.torch_utils import select_device, smart_inference_mode
 
 @smart_inference_mode()
 def run(
-    weights=ROOT / "yolov5s.pt",  # model path or triton URL
-    source=ROOT / "data/images",  # file/dir/URL/glob/screen/0(webcam)
+    weights="yolov5s.pt",  # model path or triton URL
+    source=0,  # file/dir/URL/glob/screen/0(webcam)
     data=ROOT / "data/coco128.yaml",  # dataset.yaml path
     imgsz=(640, 640),  # inference size (height, width)
     conf_thres=0.25,  # confidence threshold
@@ -175,11 +175,14 @@ def run(
         # pred = utils.general.apply_classifier(pred, classifier_model, im, im0s)
 
         # Process predictions
+        im1 = None
         for i, det in enumerate(pred):  # per image
             seen += 1
             if webcam:  # batch_size >= 1
                 p, im0, frame = path[i], im0s[i].copy(), dataset.count
                 s += f"{i}: "
+                im1 = im0.copy()
+                cv2.imshow(str(p),im0)
             else:
                 p, im0, frame = path, im0s.copy(), getattr(dataset, "frame", 0)
 
@@ -234,13 +237,15 @@ def run(
             # Stream results
             im0 = annotator.result()
             if view_img:
-                if platform.system() == "Linux" and p not in windows:
-                    windows.append(p)
-                    cv2.namedWindow(
-                        str(p), cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO
-                    )  # allow window resize (Linux)
-                    cv2.resizeWindow(str(p), im0.shape[1], im0.shape[0])
-                cv2.imshow(str(p), im0)
+                # if platform.system() == "Linux" and p not in windows:
+                    # windows.append(p)
+                    # cv2.namedWindow(
+                    #     str(p), cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO
+                    # )  # allow window resize (Linux)
+                    # cv2.resizeWindow(str(p), im0.shape[1], im0.shape[0])
+                yield (cv2, str(p),im0,im1)
+                
+                # cv2.imshow(str(p), im0)
                 cv2.waitKey(1)  # 1 millisecond
 
             # Save results (image with detections)

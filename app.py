@@ -1,12 +1,15 @@
 import customtkinter as ctk
 from threading import Thread
-from main import run_detection_in_app
+from main import run_detection_in_app,run
 import os
 import cv2
 from PIL import Image, ImageTk
 
 ctk.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
 ctk.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
+
+
+
 
 class Application:
     def __init__(self, master):
@@ -25,13 +28,16 @@ class Application:
         self.right_frame = ctk.CTkFrame(master)  # Add this line
         self.right_frame.grid(row=0, column=2, padx=10, pady=10, sticky='nsew')  # Add this line
 
-        self.center_placeholder = ctk.CTkLabel(self.center_frame, text="Camera feed goes here")
-        self.center_placeholder.grid(row=1, column=0, sticky='nsew')
+        self.center_placeholder = ctk.CTkLabel(self.center_frame, text="")
+        self.center_placeholder.grid(row=1, column=0, sticky='nsew', padx=250,pady=10)
+        
+        self.center_placeholder_bottom = ctk.CTkLabel(self.center_frame, text="")
+        self.center_placeholder_bottom.grid(row=2, column=0, sticky='nsew', padx=250)
 
         self.right_placeholder = ctk.CTkLabel(self.right_frame, text="Other stuff goes here")
         self.right_placeholder.grid(row=1, column=0, sticky='nsew')
 
-        self.camera_feed_label = ctk.CTkLabel(self.center_frame)
+        self.camera_feed_label = ctk.CTkLabel(self.center_frame,text="")
         self.camera_feed_label.grid(row=0, column=0, sticky='nsew')
 
         # Configure the grid to expand as the window size changes
@@ -122,34 +128,42 @@ class Application:
         self.exit_button = ctk.CTkButton(self.left_frame, text="Exit", command=self.exit_app, corner_radius=10)
         self.exit_button.grid(row=17, column=0, columnspan=2, pady=10)
 
-        # Add placeholders to the center and right frames
-        self.center_placeholder = ctk.CTkLabel(self.center_frame, text="Camera feed goes here")
-        self.center_placeholder.grid(row=0, column=0, sticky='nsew')
 
-        self.right_placeholder = ctk.CTkLabel(self.right_frame, text="Other stuff goes here")
-        self.right_placeholder.grid(row=0, column=0, sticky='nsew')
-
-    # def update_camera_feed(self):
-    #     # Capture a frame from the camera
-    #     ret, frame = self.cap.read()
-
-    #     if ret:
-    #         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
-    #         img = Image.fromarray(cv2image)
-
-    #         imgtk = ImageTk.PhotoImage(image=img)
-
-    #         self.camera_feed_label.imgtk = imgtk
-    #         self.camera_feed_label.configure(image=imgtk)
-
-    #     self.center_frame.after(10, self.update_camera_feed)
-        
     def run_detection(self):
+        self.is_running = True
+        self.update_thread = Thread(target=self.update_camera_feed)
+        self.update_thread.start()
+
+    def update_camera_feed(self):
         weights = self.weights_entry.get()
         source = self.source_entry.get()
 
-        args = (weights, source)
-        run_detection_in_app(*args)
+        for cv2, p, im0,im in run():
+            if not self.is_running:
+                break
+
+            cv2image = cv2.cvtColor(im0, cv2.COLOR_BGR2RGBA)
+            img = Image.fromarray(cv2image)
+            imgtk = ImageTk.PhotoImage(image=img)
+            # self.center_placeholder['image'] = imgtk  # update this label
+            self.center_placeholder.imgtk = imgtk
+            self.center_placeholder.configure(image=imgtk)
+            
+    # def run_detection(self):
+    #     weights = self.weights_entry.get()
+    #     source = self.source_entry.get()
+
+    #     for cv2,p,im0 in run():
+    #         cv2.imshow(p,im0)
+    #         cv2image = cv2.cvtColor(im0, cv2.COLOR_BGR2RGBA)
+    #         img = Image.fromarray(cv2image)
+    #         imgtk = ImageTk.PhotoImage(image=img)
+    #         self.camera_feed_label['Image'] = imgtk
+    #         self.camera_feed_label.imgtk = imgtk
+    #         self.camera_feed_label.configure(image=imgtk)
+            
+       
+            
 
     def exit_app(self):
         os._exit(0)
