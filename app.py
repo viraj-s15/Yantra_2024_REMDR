@@ -130,24 +130,14 @@ class Application:
 
 
     def run_detection(self):
-        self.is_running = True
-        self.update_thread = Thread(target=self.update_camera_feed)
-        self.update_thread.start()
-
-    def update_camera_feed(self):
         weights = self.weights_entry.get()
         source = self.source_entry.get()
 
         for cv2, p, im0,im in run():
             if not self.is_running:
                 break
-
-            cv2image = cv2.cvtColor(im0, cv2.COLOR_BGR2RGBA)
-            img = Image.fromarray(cv2image)
-            imgtk = ImageTk.PhotoImage(image=img)
-            # self.center_placeholder['image'] = imgtk  # update this label
-            self.center_placeholder.imgtk = imgtk
-            self.center_placeholder.configure(image=imgtk)
+            cv2.imshow(p,im0)
+            
             
     # def run_detection(self):
     #     weights = self.weights_entry.get()
