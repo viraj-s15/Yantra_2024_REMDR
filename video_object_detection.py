@@ -10,10 +10,13 @@ from imageai.Detection import VideoObjectDetection
 os.environ["HSA_OVERRIDE_GFX_VERSION"] = "10.3.0"
 torch.cuda.set_device("cuda:0")
 
+
 def get_detector(execution_path):
     detector = VideoObjectDetection()
     detector.setModelTypeAsRetinaNet()
-    detector.setModelPath(os.path.join(execution_path, "models/retinanet_resnet50_fpn_coco-eeacb38b.pth"))
+    detector.setModelPath(
+        os.path.join(execution_path, "models/retinanet_resnet50_fpn_coco-eeacb38b.pth")
+    )
     detector.loadModel()
     return detector
 
@@ -54,20 +57,17 @@ def detect_objects(detector, camera, run_time):
             break
 
         ret, frame = camera.read()
-        print(ret)
 
         if not ret:
             break
-
+        
         video_path = detector.detectObjectsFromVideo(
             camera_input=camera,
             output_file_path=f"clips/camera_detected_video_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}",
-            frames_per_second=10,
+            frames_per_second=24,
             log_progress=True,
-            minimum_percentage_probability=0,
+            minimum_percentage_probability=30,
             per_second_function=forSeconds,
-            per_frame_function=forFrame,
-            per_minute_function=forMinute,
         )
 
     camera.release()
@@ -82,6 +82,7 @@ def run_detect_objects(run_time, app):
         detect_objects(detector, camera, run_time)
     camera.release()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Specify the runtime of the script.")
     parser.add_argument(
@@ -92,6 +93,5 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     run_detect_objects(args.run_time)
-# Release resources
+    # Release resources
     cv2.destroyAllWindows()
-    
