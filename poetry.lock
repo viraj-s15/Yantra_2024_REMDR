@@ -42,7 +42,7 @@ develop = false
 type = "git"
 url = "https://github.com/viraj-s15/ImageAI.git"
 reference = "master"
-resolved_reference = "b6a9ad81074b0b2679b812fa822241a5718fe66e"
+resolved_reference = "50c4ab7aaa5671b5306f89b665a8edc32c3eb51e"
 
 [[package]]
 name = "numpy"
