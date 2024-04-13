@@ -6,3 +6,4 @@ weights/retinanet_resnet50_fpn_coco-eeacb38b.pth
 __pycache__
 weights/yolov3.pt
 .vscode/settings.json
+.metals

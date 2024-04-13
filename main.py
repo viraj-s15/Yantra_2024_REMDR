@@ -29,6 +29,7 @@ Usage - formats:
 """
 
 import argparse
+from distutils.command.check import check
 import os
 import platform
 import sys
@@ -389,6 +390,65 @@ def main(opt):
     check_requirements(ROOT / "requirements.txt", exclude=("tensorboard", "thop"))
     run(**vars(opt))
 
+@smart_inference_mode()
+def run_detection_in_app(
+    weights="weights/yolov5s.pt",  # model path or triton URL
+    source=0,  # file/dir/URL/glob/screen/0(webcam)
+    data=ROOT / "data/coco128.yaml",  # dataset.yaml path
+    imgsz=(600, 800),  # inference size (height, width)
+    conf_thres=0.25,  # confidence threshold
+    iou_thres=0.45,  # NMS IOU threshold
+    max_det=1000,  # maximum detections per image
+    device="0",  # cuda device, i.e. 0 or 0,1,2,3 or cpu
+    view_img=False,  # show results
+    save_txt=False,  # save results to *.txt
+    save_conf=False,  # save confidences in --save-txt labels
+    save_crop=False,  # save cropped prediction boxes
+    nosave=False,  # do not save images/videos
+    classes=None,  # filter by class: --class 0, or --class 0 2 3
+    agnostic_nms=False,  # class-agnostic NMS
+    augment=False,  # augmented inference
+    visualize=False,  # visualize features
+    update=False,  # update all models
+    project=ROOT / "runs/detect",  # save results to project/name
+    name="exp",  # save results to project/name
+    exist_ok=False,  # existing project/name ok, do not increment
+    line_thickness=3,  # bounding box thickness (pixels)
+    hide_labels=False,  # hide labels
+    hide_conf=False,  # hide confidences
+    half=False,  # use FP16 half-precision inference
+    dnn=False,  # use OpenCV DNN for ONNX inference
+    vid_stride=1,  # video frame-rate stride):
+):
+    run(weights="yolov5s.pt",  # model path or triton URL
+        source=0,  # file/dir/URL/glob/screen/0(webcam)
+        data=data,  # dataset.yaml path
+        imgsz=imgsz,  # inference size (height, width)
+        conf_thres=conf_thres,  # confidence threshold
+        iou_thres=iou_thres,  # NMS IOU threshold
+        max_det=max_det,  # maximum detections per image
+        device=device,  # cuda device, i.e. 0 or 0,1,2,3 or cpu
+        view_img=view_img,  # show results
+        save_txt=save_txt,  # save results to *.txt
+        save_conf=save_conf,  # save confidences in --save-txt labels
+        save_crop=save_crop,  # save cropped prediction boxes
+        nosave=nosave,  # do not save images/videos
+        classes=classes,  # filter by class: --class 0, or --class 0 2 3
+        agnostic_nms=agnostic_nms,  # class-agnostic NMS
+        augment=augment,  # augmented inference
+        visualize=visualize,  # visualize features
+        update=update,  # update all models
+        project=project,  # save results to project/name
+        name=name,  # save results to project/name
+        exist_ok=exist_ok,  # existing project/name ok, do not increment
+        line_thickness=line_thickness,  # bounding box thickness (pixels)
+        hide_labels=hide_labels,  # hide labels
+        hide_conf=hide_conf,  # hide confidences
+        half=half,  # use FP16 half-precision inference
+        dnn=dnn,  # use OpenCV DNN for ONNX inference
+        vid_stride=vid_stride,  # video frame-rate stride):
+    )
+    
 
 if __name__ == "__main__":
     opt = parse_opt()
