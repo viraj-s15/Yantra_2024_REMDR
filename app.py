@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from threading import Thread
 from main import run_detection_in_app, run
+from get_sensor_data import get_gas_data,get_temperature_humidity
 import os
 import cv2
 from PIL import Image, ImageTk
@@ -17,19 +18,37 @@ class Application:
         master.configure(bg="lightgrey")
         master.resizable(False, False)
         # Create three frames for the three columns
-        master.geometry("1280x530")
+        master.geometry("1050x530")
         self.left_frame = ctk.CTkFrame(master)
         self.left_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-        self.right_frame = ctk.CTkFrame(master)  # Add this line
-        self.right_frame.grid(
-            row=0, column=2, padx=10, pady=10, sticky="nsew"
-        )  # Add this line
+        self.right_frame = ctk.CTkFrame(master)
+        self.right_frame.grid(row=0, column=2, padx=10, pady=10, sticky="nsew")
 
-        self.right_placeholder = ctk.CTkLabel(
-            self.right_frame, text="Other stuff goes here"
-        )
-        self.right_placeholder.grid(row=1, column=0, sticky="nsew")
+        self.lpg_label = ctk.CTkLabel(self.right_frame, text="")
+        self.lpg_label.grid(row=0, column=0, sticky="nsew",padx=10, pady=10)
+
+        self.co_label = ctk.CTkLabel(self.right_frame, text="")
+        self.co_label.grid(row=1, column=0, sticky="nsew",padx=10, pady=10)
+
+        self.butane_label = ctk.CTkLabel(self.right_frame, text="")
+        self.butane_label.grid(row=2, column=0, sticky="nsew",padx=10, pady=10)
+
+        self.hum_label = ctk.CTkLabel(self.right_frame, text="")
+        self.hum_label.grid(row=3, column=0, sticky="nsew",padx=10, pady=10)
+
+        self.temp_label = ctk.CTkLabel(self.right_frame, text="")
+        self.temp_label.grid(row=4, column=0, sticky="nsew",padx=10, pady=10)
+
+        
+        self.hic = ctk.CTkLabel(self.right_frame, text="")
+        self.hic.grid(row=5, column=0, sticky="nsew",padx=10, pady=10)
+
+        self.hif = ctk.CTkLabel(self.right_frame, text="")
+        self.hif.grid(row=6, column=0, sticky="nsew",padx=10, pady=10)
+
+        self.update_labels()
+
 
         self.weights_label = ctk.CTkLabel(self.left_frame, text="Weights:")
         self.weights_label.grid(row=0, column=0, sticky="nsew", padx=(10, 0), pady=15)
@@ -159,6 +178,21 @@ class Application:
             if not self.is_running:
                 break
             cv2.imshow(p, im0)
+ 
+    def update_labels(self):
+        gas_data = get_gas_data()
+        temp_hum_data = get_temperature_humidity()
+
+        self.lpg_label.configure(text="LPG: " + str(gas_data['LPG']))
+        self.co_label.configure(text="CO: " + str(gas_data['CO']))
+        self.butane_label.configure(text="Smoke: " + str(gas_data['Smoke']))
+        self.hum_label.configure(text=str("Humidity: " + str(temp_hum_data['Humidity'])))
+        self.temp_label.configure(text=str("Temperature: " + str(temp_hum_data['Temperature'])))
+        self.hic.configure(text=str("Heat Index(Celsius): " + str(temp_hum_data['HIC'])))
+        self.hif.configure(text=str("Heat index(Farhenhei): " + str(temp_hum_data['HIF'])))
+
+        # Update the labels every 1000ms
+        self.master.after(1000, self.update_labels)
 
     def exit_app(self):
         os._exit(0)
